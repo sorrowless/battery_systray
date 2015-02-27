@@ -43,19 +43,28 @@ class Indicator:
 
 class Application:
     def __init__(self):
-        if os.path.isfile('%s/.config/battery-systray/settings.json' % os.getenv('HOME')):
+        if os.path.isfile('settings.json'):
+            settings = json.load(open('settings.json','r'))
+        elif os.path.isfile('%s/.config/battery-systray/settings.json' % os.getenv('HOME')):
             settings = json.load(open('%s/.config/battery-systray/settings.json' % os.getenv('HOME'),'r'))
         elif os.path.isfile('/etc/battery-systray/settings.json'):
             settings = json.load(open('/etc/battery-systray/settings.json','r'))
-        elif os.path.isfile('settings.json'):
-            settings = json.load(open('settings.json','r'))
         else:
           print('Settings file not found.')
           sys.exit()
 
         # TODO: check files existance in theme dir
         theme = settings['theme']['themeName']
-        if os.path.isdir('%s/.config/battery-systray/themes/%s' % (os.getenv('HOME'),theme)):
+        if os.path.isdir('themes/%s' % theme):
+            path = 'themes'
+            self.null_icon = os.path.abspath('%s/%s/00-nocharging.svg' % (path,theme))
+            self.caution_icon = os.path.abspath('%s/%s/01-caution.svg' % (path,theme))
+            self.low_icon = os.path.abspath('%s/%s/05-low.svg' % (path,theme))
+            self.good_icon = os.path.abspath('%s/%s/10-good.svg' % (path,theme))
+            self.full_icon = os.path.abspath('%s/%s/15-full.svg' % (path,theme))
+            self.charging_icon = os.path.abspath('%s/%s/50-charging.svg' % (path,theme))
+            self.full_charging_icon = os.path.abspath('%s/%s/99-full-charging.svg' % (path,theme))
+        elif os.path.isdir('%s/.config/battery-systray/themes/%s' % (os.getenv('HOME'),theme)):
             path = '%s/.config/battery-systray/themes' % os.getenv('HOME')
             self.null_icon = os.path.abspath('%s/%s/00-nocharging.svg' % (path,theme))
             self.caution_icon = os.path.abspath('%s/%s/01-caution.svg' % (path,theme))
@@ -73,22 +82,15 @@ class Application:
             self.full_icon = os.path.abspath('%s/%s/15-full.svg' % (path,theme))
             self.charging_icon = os.path.abspath('%s/%s/50-charging.svg' % (path,theme))
             self.full_charging_icon = os.path.abspath('%s/%s/99-full-charging.svg' % (path,theme))
-        elif os.path.isdir('themes/%s' % theme):
-            path = 'themes'
-            self.null_icon = os.path.abspath('%s/%s/00-nocharging.svg' % (path,theme))
-            self.caution_icon = os.path.abspath('%s/%s/01-caution.svg' % (path,theme))
-            self.low_icon = os.path.abspath('%s/%s/05-low.svg' % (path,theme))
-            self.good_icon = os.path.abspath('%s/%s/10-good.svg' % (path,theme))
-            self.full_icon = os.path.abspath('%s/%s/15-full.svg' % (path,theme))
-            self.charging_icon = os.path.abspath('%s/%s/50-charging.svg' % (path,theme))
-            self.full_charging_icon = os.path.abspath('%s/%s/99-full-charging.svg' % (path,theme))
         else:
             print('Theme directory not found.')
             sys.exit()
 
         self.indicator = Indicator(self.null_icon)
         self.indicator.add_menu_item(lambda x: Gtk.main_quit(), "Quit")
-        self.indicator.set_refresh(10000, self.check_battery)
+        refresh_timeout = int(settings['common']['refresh_timeout'])
+        if not refresh_timeout or refresh_timeout < 1000: refresh_timeout = 1000
+        self.indicator.set_refresh(refresh_timeout, self.check_battery)
         #self.indicator.icon.set_tooltip_text(subprocess.getoutput("acpi"))
         self.indicator.icon.set_has_tooltip(True)
         self.indicator.icon.connect("query-tooltip", self.tooltip_query)

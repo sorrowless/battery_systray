@@ -1,5 +1,8 @@
 {
  "theme": {
    "themeName": "faenza"
+ },
+ "common": {
+   "refresh_timeout": "5000"
  }
 }
