@@ -8,3 +8,6 @@ or in 'themes' directory where program lay.
 
 Also can be placed config file, but it is also can be in:
 /etc/
+
+In settings file you can set a theme by theme name and timeout interval to
+update indicator.
