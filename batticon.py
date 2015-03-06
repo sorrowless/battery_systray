@@ -68,7 +68,7 @@ class Application:
 
         self.chlist = []
         self.dischlist = []
-        regex = re.compile(r'(?P<val>\d\d|100)-(?P<stat>charging|discharging)\.(?P<ext>png|svg)')
+        regex = re.compile(r'(?P<val>\d\d\d)-(?P<stat>charging|discharging)\.(?P<ext>png|svg)')
         # it's a bad idea, but right now I cannot do any else
         ext = ''
         for file in os.listdir(path):
@@ -81,6 +81,7 @@ class Application:
             ext = answer.group('ext')
         self.chlist.sort()
         self.dischlist.sort()
+        print(self.dischlist)
         self.deficon = path + '/default.' + ext
         self.chformat = path + '/{value}-charging.' + ext
         self.dischformat = path + '/{value}-discharging.' + ext
@@ -100,10 +101,14 @@ class Application:
         percent = subprocess.getoutput("cat /sys/class/power_supply/BAT0/capacity")
         if not self.charging:
           for v in self.dischlist:
-            self.indicator.set_icon(self.dischformat.format(value=v)) if int(percent) <= int(v) else False
+            if int(percent) <= int(v):
+              self.indicator.set_icon(self.dischformat.format(value=v))
+              break
         else:
           for v in self.chlist:
-            self.indicator.set_icon(self.chformat.format(value=v)) if int(percent) <= int(v) else False
+            if int(percent) <= int(v):
+              self.indicator.set_icon(self.chformat.format(value=v))
+              break
         return True
 
     def tooltip_query(self, widget, x, y, keyboard_mode, tooltip):
