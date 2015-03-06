@@ -5,6 +5,7 @@ import sys
 import subprocess
 import os
 import json
+import re
 
 class Indicator:
     def __init__(self, icon):
@@ -56,37 +57,35 @@ class Application:
         # TODO: check files existance in theme dir
         theme = settings['theme']['themeName']
         if os.path.isdir('themes/%s' % theme):
-            path = 'themes'
-            self.null_icon = os.path.abspath('%s/%s/00-nocharging.svg' % (path,theme))
-            self.caution_icon = os.path.abspath('%s/%s/01-caution.svg' % (path,theme))
-            self.low_icon = os.path.abspath('%s/%s/05-low.svg' % (path,theme))
-            self.good_icon = os.path.abspath('%s/%s/10-good.svg' % (path,theme))
-            self.full_icon = os.path.abspath('%s/%s/15-full.svg' % (path,theme))
-            self.charging_icon = os.path.abspath('%s/%s/50-charging.svg' % (path,theme))
-            self.full_charging_icon = os.path.abspath('%s/%s/99-full-charging.svg' % (path,theme))
+            path = os.path.abspath('themes/%s' % theme)
         elif os.path.isdir('%s/.config/battery-systray/themes/%s' % (os.getenv('HOME'),theme)):
-            path = '%s/.config/battery-systray/themes' % os.getenv('HOME')
-            self.null_icon = os.path.abspath('%s/%s/00-nocharging.svg' % (path,theme))
-            self.caution_icon = os.path.abspath('%s/%s/01-caution.svg' % (path,theme))
-            self.low_icon = os.path.abspath('%s/%s/05-low.svg' % (path,theme))
-            self.good_icon = os.path.abspath('%s/%s/10-good.svg' % (path,theme))
-            self.full_icon = os.path.abspath('%s/%s/15-full.svg' % (path,theme))
-            self.charging_icon = os.path.abspath('%s/%s/50-charging.svg' % (path,theme))
-            self.full_charging_icon = os.path.abspath('%s/%s/99-full-charging.svg' % (path,theme))
+            path = os.path.abspath('%s/.config/battery-systray/themes/%s' % (os.getenv('HOME'),theme))
         elif os.path.isdir('/usr/share/battery-systray/themes/%s' % theme):
-            path = '/usr/share/battery-systray/themes'
-            self.null_icon = os.path.abspath('%s/%s/00-nocharging.svg' % (path,theme))
-            self.caution_icon = os.path.abspath('%s/%s/01-caution.svg' % (path,theme))
-            self.low_icon = os.path.abspath('%s/%s/05-low.svg' % (path,theme))
-            self.good_icon = os.path.abspath('%s/%s/10-good.svg' % (path,theme))
-            self.full_icon = os.path.abspath('%s/%s/15-full.svg' % (path,theme))
-            self.charging_icon = os.path.abspath('%s/%s/50-charging.svg' % (path,theme))
-            self.full_charging_icon = os.path.abspath('%s/%s/99-full-charging.svg' % (path,theme))
+            path = os.path.abspath('/usr/share/battery-systray/themes/%s' % theme)
         else:
             print('Theme directory not found.')
             sys.exit()
 
-        self.indicator = Indicator(self.null_icon)
+        self.chlist = []
+        self.dischlist = []
+        regex = re.compile(r'(?P<val>\d\d|100)-(?P<stat>charging|discharging)\.(?P<ext>png|svg)')
+        # it's a bad idea, but right now I cannot do any else
+        ext = ''
+        for file in os.listdir(path):
+          answer = regex.match(file)
+          if (file.endswith('-charging.png') or file.endswith('-charging.svg')) and answer.group('val'):
+            self.chlist.append(answer.group('val'))
+          elif (file.endswith('-discharging.png') or file.endswith('-discharging.svg')) and answer.group('val'):
+            self.dischlist.append(answer.group('val'))
+          if (file.endswith('-discharging.png') or file.endswith('-discharging.svg')) and answer.group('ext'):
+            ext = answer.group('ext')
+        self.chlist.sort()
+        self.dischlist.sort()
+        self.deficon = path + '/default.' + ext
+        self.chformat = path + '/{value}-charging.' + ext
+        self.dischformat = path + '/{value}-discharging.' + ext
+
+        self.indicator = Indicator(self.deficon)
         self.indicator.add_menu_item(lambda x: Gtk.main_quit(), "Quit")
         refresh_timeout = int(settings['common']['refresh_timeout'])
         if not refresh_timeout or refresh_timeout < 1000: refresh_timeout = 1000
@@ -100,19 +99,11 @@ class Application:
         self.charging = False if subprocess.getoutput("cat /sys/class/power_supply/BAT0/status") == 'Discharging' else True
         percent = subprocess.getoutput("cat /sys/class/power_supply/BAT0/capacity")
         if not self.charging:
-            if int(percent) > 70:
-                self.indicator.set_icon(self.full_icon)
-            elif int(percent) > 40:
-                self.indicator.set_icon(self.good_icon)
-            elif int(percent) > 10:
-                self.indicator.set_icon(self.low_icon)
-            elif int(percent) <= 10:
-                self.indicator.set_icon(self.caution_icon)
+          for v in self.dischlist:
+            self.indicator.set_icon(self.dischformat.format(value=v)) if int(percent) <= int(v) else False
         else:
-            if int(percent) > 70:
-                self.indicator.set_icon(self.full_charging_icon)
-            else:
-                self.indicator.set_icon(self.charging_icon)
+          for v in self.chlist:
+            self.indicator.set_icon(self.chformat.format(value=v)) if int(percent) <= int(v) else False
         return True
 
     def tooltip_query(self, widget, x, y, keyboard_mode, tooltip):
