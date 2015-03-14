@@ -115,6 +115,9 @@ class Application:
         tooltip.set_text(subprocess.getoutput("acpi"))
         return True
 
+def main():
+  app = Application()
+  Gtk.main()
+
 if __name__ == '__main__':
-    app = Application()
-    Gtk.main()
+  main()
