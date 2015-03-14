@@ -1,5 +1,4 @@
-# battery_systray
-Simple system tray widget that show battery status. Written with GTK 3.
+Batticon is Simple system tray widget that show battery status. Written with GTK 3.
 To use, just place it where you want and start.
 Themes can be placed in:
 ~/.config/battery_systray/themes/

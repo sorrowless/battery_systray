@@ -1,0 +1,2 @@
+pygobject==3.14.0
+PyYAML==3.11
