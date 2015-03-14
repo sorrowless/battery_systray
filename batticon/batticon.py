@@ -46,10 +46,10 @@ class Application:
     def __init__(self):
         if os.path.isfile('settings.json'):
             settings = json.load(open('settings.json','r'))
-        elif os.path.isfile('%s/.config/battery-systray/settings.json' % os.getenv('HOME')):
-            settings = json.load(open('%s/.config/battery-systray/settings.json' % os.getenv('HOME'),'r'))
-        elif os.path.isfile('/etc/battery-systray/settings.json'):
-            settings = json.load(open('/etc/battery-systray/settings.json','r'))
+        elif os.path.isfile('%s/.config/batticon/settings.json' % os.getenv('HOME')):
+            settings = json.load(open('%s/.config/batticon/settings.json' % os.getenv('HOME'),'r'))
+        elif os.path.isfile('/etc/batticon/settings.json'):
+            settings = json.load(open('/etc/batticon/settings.json','r'))
         else:
           print('Settings file not found.')
           sys.exit()
@@ -58,10 +58,10 @@ class Application:
         theme = settings['theme']['themeName']
         if os.path.isdir('themes/%s' % theme):
             path = os.path.abspath('themes/%s' % theme)
-        elif os.path.isdir('%s/.config/battery-systray/themes/%s' % (os.getenv('HOME'),theme)):
-            path = os.path.abspath('%s/.config/battery-systray/themes/%s' % (os.getenv('HOME'),theme))
-        elif os.path.isdir('/usr/share/battery-systray/themes/%s' % theme):
-            path = os.path.abspath('/usr/share/battery-systray/themes/%s' % theme)
+        elif os.path.isdir('%s/.config/batticon/themes/%s' % (os.getenv('HOME'),theme)):
+            path = os.path.abspath('%s/.config/batticon/themes/%s' % (os.getenv('HOME'),theme))
+        elif os.path.isdir('/usr/share/batticon/themes/%s' % theme):
+            path = os.path.abspath('/usr/share/batticon/themes/%s' % theme)
         else:
             print('Theme directory not found.')
             sys.exit()
@@ -115,6 +115,9 @@ class Application:
         tooltip.set_text(subprocess.getoutput("acpi"))
         return True
 
+def main():
+  app = Application()
+  Gtk.main()
+
 if __name__ == '__main__':
-    app = Application()
-    Gtk.main()
+  main()
