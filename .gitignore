@@ -1,3 +1,4 @@
 .idea
 batticon.egg-info/
 dist
+__pycache__
