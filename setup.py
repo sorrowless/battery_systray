@@ -8,12 +8,12 @@ with open(path.join(here, 'README'), encoding='utf-8') as f:
   long_description = f.read()
 
 setup(name='batticon',
-      version='0.1.0',
+      version='0.1.2',
 
       author="Stanislaw Bogatkin",
       author_email="sbog@sbog.ru",
 
-      description="This is a simple battery incdicator for system tray",
+      description="This is a simple battery indicator for system tray",
       long_description=long_description,
       url='https://github.com/sorrowless/battery_systray',
       keywords="battery indicator systray system tray",

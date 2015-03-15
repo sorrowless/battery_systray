@@ -6,7 +6,7 @@ Themes can be placed in:
 or in 'themes' directory where program lay.
 
 Also can be placed config file, but it is also can be in:
-/etc/
+/etc/batticon
 
 In settings file you can set a theme by theme name and timeout interval to
 update indicator.
@@ -20,3 +20,7 @@ about next things:
 discharging battery. Actually, it can be equal set of icons, but it should have
 different names (<battery_percent>-charging.<png|svg> for charging and similar
 but with 'discharging' instead 'charging' for discharging battery mode.
+
+Be cautious - program depends on pygobject for GTK3 and this package usually
+distributed by OS itself. For example, it just doesn't work if I trying to
+install it from pip in my Arch laptop.
