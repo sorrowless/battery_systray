@@ -4,11 +4,11 @@ import glob
 from os import path
 
 here = path.abspath(path.dirname(__file__))
-with open(path.join(here, 'README'), encoding='utf-8') as f:
+with open(path.join(here, 'README.md'), encoding='utf-8') as f:
   long_description = f.read()
 
 setup(name='batticon',
-      version='0.1.3',
+      version='0.1.4',
 
       author="Stanislaw Bogatkin",
       author_email="sbog@sbog.ru",
@@ -20,6 +20,10 @@ setup(name='batticon',
       license="GPL",
 
       packages=['batticon'],
+
+      package_data= {
+        '': ['requirements.txt','README.md'],
+      },
 
       data_files=[('/usr/share/batticon/themes/baloon', glob.glob('batticon/themes/baloon/*')),
                   ('/usr/share/batticon/themes/faenza', glob.glob('batticon/themes/faenza/*')),

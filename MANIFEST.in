@@ -1,2 +1,4 @@
 graft batticon/themes
 include batticon/settings.json
+include README.md
+include requirements.txt
