@@ -8,7 +8,7 @@ with open(path.join(here, 'README'), encoding='utf-8') as f:
   long_description = f.read()
 
 setup(name='batticon',
-      version='0.1.2',
+      version='0.1.3',
 
       author="Stanislaw Bogatkin",
       author_email="sbog@sbog.ru",
